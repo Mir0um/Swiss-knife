@@ -7,10 +7,19 @@ import sqlite3
 from io import StringIO, BytesIO
 from datetime import datetime
 import socket
-import pandas_profiling
+#import pandas_profiling
+#from ydata_profiling import ProfileReport
 from streamlit_pandas_profiling import st_profile_report
+from pydantic_settings import BaseSettings
 from ydata_profiling import ProfileReport
 import openpyxl
+
+def generate_sql(df, table_name="exported_table"):
+                    sql_statements = []
+                    for _, row in df.iterrows():
+                        values = ', '.join(f"'{str(v)}'" for v in row)
+                        sql_statements.append(f"INSERT INTO {table_name} VALUES ({values});")
+                    return '\n'.join(sql_statements)
 
 # Configuration de la page
 st.set_page_config(page_title="Data_convertisseur",
@@ -90,7 +99,9 @@ with tabs[0]:
                 data = json.load(uploaded_file)
                 df = pd.json_normalize(data)
             elif file_type in ["xlsx", "xlsm", "xlsb", "odf"]:
-                df = pd.read_excel(uploaded_file)
+                excel_file = pd.ExcelFile(uploaded_file)
+                sheet_name = st.selectbox("Sélectionnez une feuille :", excel_file.sheet_names)
+                df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
             elif file_type == "sql":
                 conn = sqlite3.connect(uploaded_file)
                 tables = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table';", conn)
@@ -132,7 +143,7 @@ tabs[1].header("Exportation des Fichiers")
 with tabs[1]:
     if 'df' in locals() and df is not None:
         # Sélection du format de conversion
-        export_format = st.selectbox("Choisissez un format de conversion :", ["CSV", "JSON", "SQL", "Excel"])
+        export_format = st.selectbox("Choisissez un format de conversion :", ["CSV", "JSON", "SQL", "DB", "Excel"])
 
         if export_format:
             if export_format == "CSV":
@@ -153,7 +164,7 @@ with tabs[1]:
                 df.to_excel(buffer, index=False, engine='openpyxl')
                 file_data = buffer.getvalue()
                 filename = "converted_file.xlsx"
-            elif export_format == "SQL":
+            elif export_format == "DB":
                 conn = sqlite3.connect("converted_file.db")
                 table_name = st.text_input("Nom de la table pour l'export :", "exported_table")
                 df.to_sql(table_name, conn, if_exists="replace", index=False)
@@ -161,6 +172,14 @@ with tabs[1]:
                 with open("converted_file.db", "rb") as f:
                     file_data = f.read()
                 filename = "converted_file.db"
+
+            elif export_format == "SQL":
+                buffer = StringIO()
+                buffer.write(generate_sql(df))
+                file_data = buffer.getvalue().encode('utf-8')
+                filename = "converted_file.sql"
+
+            
 
             # Section de téléchargements basiques
             st.header("Téléchargement basique")
