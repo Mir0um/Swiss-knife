@@ -1,3 +1,22 @@
+```                                                                                                                                                                                               
+   SSSSSSSSSSSSSSS                                      iiii                                                     KKKKKKKKK    KKKKKKK                    iiii     ffffffffffffffff                  
+ SS:::::::::::::::S                                    i::::i                                                    K:::::::K    K:::::K                   i::::i   f::::::::::::::::f                 
+S:::::SSSSSS::::::S                                     iiii                                                     K:::::::K    K:::::K                    iiii   f::::::::::::::::::f                
+S:::::S     SSSSSSS                                                                                              K:::::::K   K::::::K                           f::::::fffffff:::::f                
+S:::::S      wwwwwww           wwwww           wwwwwwwiiiiiii     ssssssssss       ssssssssss                    KK::::::K  K:::::KKKnnnn  nnnnnnnn    iiiiiii  f:::::f       ffffffeeeeeeeeeeee    
+S:::::S       w:::::w         w:::::w         w:::::w i:::::i   ss::::::::::s    ss::::::::::s                     K:::::K K:::::K   n:::nn::::::::nn  i:::::i  f:::::f           ee::::::::::::ee  
+ S::::SSSS     w:::::w       w:::::::w       w:::::w   i::::i ss:::::::::::::s ss:::::::::::::s                    K::::::K:::::K    n::::::::::::::nn  i::::i f:::::::ffffff    e::::::eeeee:::::ee
+  SS::::::SSSSS w:::::w     w:::::::::w     w:::::w    i::::i s::::::ssss:::::ss::::::ssss:::::s ---------------   K:::::::::::K     nn:::::::::::::::n i::::i f::::::::::::f   e::::::e     e:::::e
+    SSS::::::::SSw:::::w   w:::::w:::::w   w:::::w     i::::i  s:::::s  ssssss  s:::::s  ssssss  -:::::::::::::-   K:::::::::::K       n:::::nnnn:::::n i::::i f::::::::::::f   e:::::::eeeee::::::e
+       SSSSSS::::Sw:::::w w:::::w w:::::w w:::::w      i::::i    s::::::s         s::::::s       ---------------   K::::::K:::::K      n::::n    n::::n i::::i f:::::::ffffff   e:::::::::::::::::e 
+            S:::::Sw:::::w:::::w   w:::::w:::::w       i::::i       s::::::s         s::::::s                      K:::::K K:::::K     n::::n    n::::n i::::i  f:::::f         e::::::eeeeeeeeeee  
+            S:::::S w:::::::::w     w:::::::::w        i::::i ssssss   s:::::s ssssss   s:::::s                  KK::::::K  K:::::KKK  n::::n    n::::n i::::i  f:::::f         e:::::::e           
+SSSSSSS     S:::::S  w:::::::w       w:::::::w        i::::::is:::::ssss::::::ss:::::ssss::::::s                 K:::::::K   K::::::K  n::::n    n::::ni::::::if:::::::f        e::::::::e          
+S::::::SSSSSS:::::S   w:::::w         w:::::w         i::::::is::::::::::::::s s::::::::::::::s                  K:::::::K    K:::::K  n::::n    n::::ni::::::if:::::::f         e::::::::eeeeeeee  
+S:::::::::::::::SS     w:::w           w:::w          i::::::i s:::::::::::ss   s:::::::::::ss                   K:::::::K    K:::::K  n::::n    n::::ni::::::if:::::::f          ee:::::::::::::e  
+ SSSSSSSSSSSSSSS        www             www           iiiiiiii  sssssssssss      sssssssssss                     KKKKKKKKK    KKKKKKK  nnnnnn    nnnnnniiiiiiiifffffffff            eeeeeeeeeeeeee                                                                                                                                                                                                  
+```
+
 # Swiss-Knife
 
 Swiss-Knife est une application Web réalisée en Python (compatible avec Python 3.9.12) qui offre une solution tout-en-un pour l'importation, la conversion, l'exportation et l'analyse de fichiers de données. Grâce à une interface utilisateur construite avec Streamlit, l’application permet de charger différents formats de fichiers (CSV, JSON, SQL, Excel), de les convertir en divers formats et de générer des rapports de profilage de données détaillés.
