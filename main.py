@@ -1,296 +1,63 @@
 import streamlit as st
-import pandas as pd
-import ftplib
-import json
-import csv
-import sqlite3
-from io import StringIO, BytesIO
-from datetime import datetime
-import socket
-#import pandas_profiling
-#from ydata_profiling import ProfileReport
-from streamlit_pandas_profiling import st_profile_report
-from pydantic_settings import BaseSettings
-from ydata_profiling import ProfileReport
-import openpyxl
-
-def generate_sql(df, table_name="exported_table"):
-                    sql_statements = []
-                    for _, row in df.iterrows():
-                        values = ', '.join(f"'{str(v)}'" for v in row)
-                        sql_statements.append(f"INSERT INTO {table_name} VALUES ({values});")
-                    return '\n'.join(sql_statements)
+import SK.head
+import SK.importdata   
+import SK.netoyage
+import SK.exportation
+import SK.analyse
 
 # Configuration de la page
 st.set_page_config(page_title="Data_convertisseur",
                     page_icon="http://89.86.5.13/img/logo.png",
                     layout="wide",
                     initial_sidebar_state="collapsed",
-                    menu_items={
-                            'Get Help': 'https://www.extremelycoolapp.com/help',
-                            'Report a bug': "https://www.extremelycoolapp.com/bug",
-                            'About': "# This is a header. This is an *extremely* cool app!"
-                        }
+                    #menu_items={
+                    #        'Get Help': 'https://www.extremelycoolapp.com/help',
+                    #        'Report a bug': "https://www.extremelycoolapp.com/bug",
+                    #        'About': "# This is a header. This is an *extremely* cool app!"
+                    #    }
                    )
-# Titre principal
-col1, col2 = st.columns([1,12])
 
-with col1:
-    st.image("./logo.png", width=120)
-with col2:
-    st.header("Convertisseur de fichiers")
+
+SK.head.head()
+
+with st.sidebar:
+    st.write("Config ver un seveur SFTPS ou SQL")
+    with st.expander("conetion en SFTPS."):
+        ftp_host = st.text_input("FTP Host")
+        ftp_port = st.number_input("FTP Port", min_value=1, max_value=65535, value=21)
+        ftp_user = st.text_input("FTP Username")
+        ftp_password = st.text_input("FTP Password", type="password")
+        ftp_directory = st.text_input("FTP Directory", value="/")
+    
+    with st.expander("conetion a un serveur SQL."):
+        SQL_host = st.text_input("SQL Host")
+        SQL_port = st.number_input("SQL Port", min_value=1, max_value=65535, value=3306 )
+        SQL_user = st.text_input("SQL Username")
+        SQL_password = st.text_input("SQL Password", type="password")
+        SQL_bdd = st.text_input("SQL Database name.", value="/")
+
+
 
 # Créer des onglets pour l'importation et l'exportation
-tabs = st.tabs(["Importation","Netoyage", "Exportation", "Configuration", "Analyse de données"])
+tabsName = ["Importation","Netoyage", "Exportation", "Analyse de données"]
+tabs = st.tabs(tabsName)
+
+tabselect = {}
+for num, i in enumerate( tabs):
+    tabselect[tabsName[num]] = i
 
 
+with tabselect["Importation"]: 
+    df = SK.importdata.importdata()
 
 
-# Onglet Importation
-tabs[0].header("Importation des Fichiers")
-with tabs[0]:
-    uploaded_file = st.file_uploader("Chargez un fichier (CSV, JSON, SQL, ou Excel)", type=["csv", "json", "sql", "xlsx", "xlsm", "xlsb", "odf"])
-
-    if uploaded_file:
-        file_type = uploaded_file.name.split('.')[-1]
-
-        try:
-            if file_type == "csv":
-                # Détection automatique du séparateur
-                decoders = encodings = [
-                                        'ascii',        # Encodage ASCII standard
-                                        'utf-8',        # Encodage Unicode standard
-                                        'utf-16',       # Encodage Unicode sur 2 ou 4 octets
-                                        'utf-32',       # Encodage Unicode sur 4 octets
-                                        'latin-1',      # Encodage ISO-8859-1 pour les langues d'Europe occidentale
-                                        'cp1252',       # Encodage Windows pour les langues d'Europe occidentale
-                                        'iso-8859-15',  # Variante de l'ISO-8859-1 avec le symbole de l'euro
-                                        'mac-roman',    # Encodage utilisé sur les anciens systèmes Mac
-                                        'big5',         # Encodage pour le chinois traditionnel
-                                        'gb2312',       # Encodage pour le chinois simplifié
-                                        'shift_jis',    # Encodage pour le japonais
-                                        'euc-jp',       # Encodage pour le japonais
-                                        'euc-kr',       # Encodage pour le coréen
-                                        'koi8-r',       # Encodage pour le russe
-                                        'cp866',        # Encodage DOS pour le russe
-                                        'cp850',        # Encodage DOS pour l'Europe occidentale
-                                        'cp437',        # Encodage DOS original
-                                        'utf-7',        # Encodage Unicode obsolète
-                                        'utf-8-sig',    # UTF-8 avec marque d'ordre d'octet (BOM)
-                                        'utf-16-be',    # UTF-16 big-endian
-                                        'utf-16-le',    # UTF-16 little-endian
-                                        'utf-32-be',    # UTF-32 big-endian
-                                        'utf-32-le',    # UTF-32 little-endian
-                                    ]
-
-                for decoder in decoders:
-                    try:
-                        content = uploaded_file.read().decode(decoder, errors="ignore")
-                        break
-                    except UnicodeDecodeError:
-                        continue
-                try:
-                    sniffer = csv.Sniffer()
-                    dialect = sniffer.sniff(content[:1024])
-                    sep = dialect.delimiter
-                    st.success(f"Séparateur détecté automatiquement : '{sep}'")
-                except Exception:
-                    sep = st.text_input("Séparateur non détecté, entrez-le manuellement (par ex. ',' ou ';') :", value=",")
-                uploaded_file.seek(0)
-                df = pd.read_csv(uploaded_file, sep=sep)
-            elif file_type == "json":
-                data = json.load(uploaded_file)
-                df = pd.json_normalize(data)
-            elif file_type in ["xlsx", "xlsm", "xlsb", "odf"]:
-                excel_file = pd.ExcelFile(uploaded_file)
-                sheet_name = st.selectbox("Sélectionnez une feuille :", excel_file.sheet_names)
-                df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
-            elif file_type == "sql":
-                conn = sqlite3.connect(uploaded_file)
-                tables = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table';", conn)
-                table_name = st.selectbox("Sélectionnez une table :", tables['name'])
-                df = pd.read_sql(f"SELECT * FROM {table_name};", conn)
-                conn.close()
-            else:
-                st.error("Type de fichier non pris en charge.")
-                df = None
-
-            if df is not None:
-                # Afficher un aperçu des données
-                st.write("Aperçu des données :")
-                st.dataframe(df)
-
-        except Exception as e:
-            st.error(f"Erreur lors du traitement : {e}")
-    else:
-        st.info("Veuillez charger un fichier pour commencer.")
-
-
-with tabs[1]:
-    st.header("Nettoyage du DataFrame")
-    if 'df' in locals() and df is not None:
-        st.subheader("1. Rognage (tranchage) des lignes")
-        # Choix des indices pour conserver une tranche de lignes
-        start_row = st.number_input("Indice de départ", min_value=0, max_value=len(df)-1, value=0, step=1)
-        end_row = st.number_input("Indice de fin", min_value=0, max_value=len(df), value=len(df), step=1)
-        df_clean = df.iloc[start_row:end_row].copy()  # On crée une copie pour éviter les modifications sur l'original
-
-        st.subheader("2. Rognage des colonnes")
-        # Sélection des colonnes à conserver
-        colonnes = df_clean.columns.tolist()
-        colonnes_a_conserver = st.multiselect("Sélectionnez les colonnes à conserver", colonnes, default=colonnes)
-        df_clean = df_clean[colonnes_a_conserver].copy()
-
-        st.subheader("3. Changement des types de colonnes")
-        # Pour chaque colonne, possibilité de choisir le type
-        for col in df_clean.columns:
-            type_actuel = df_clean[col].dtype
-            col_type = st.selectbox(f"Type pour la colonne '{col}' (actuel: {type_actuel})",
-                                    options=["None", "str", "int", "float", "bool"],
-                                    key=f"type_{col}")
-            if col_type != "None":
-                try:
-                    if col_type == "str":
-                        df_clean[col] = df_clean[col].astype(str)
-                    elif col_type == "int":
-                        df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce').astype("Int64")
-                    elif col_type == "float":
-                        df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce')
-                    elif col_type == "bool":
-                        df_clean[col] = df_clean[col].astype(bool)
-                except Exception as e:
-                    st.error(f"Erreur lors de la conversion de la colonne {col} en {col_type} : {e}")
+with tabselect["Netoyage"]:
+    df = SK.netoyage.netoyage(df)
     
 
-        st.subheader("4. Suppression des doublons")
-        if st.toggle("Supprimer les doublons"):
-            df_clean = df_clean.drop_duplicates()
-            st.success("Doublons supprimés.")
-
-        st.subheader("5. Suppression des lignes avec valeurs nulles")
-        if st.toggle("Supprimer les lignes nulles"):
-            colonnes_a_conserver = st.multiselect("Sélectionnez les colonnes à conserver", df_clean.columns.tolist())
-            if colonnes_a_conserver:
-                df_clean = df_clean.dropna(subset=colonnes_a_conserver)
-                st.success("Lignes avec valeurs nulles supprimées.")
-            else:
-                st.warning("Veuillez sélectionner au moins une colonne.")
-
-        st.subheader("6. Nettoyage des espaces (Trim)")
-        if st.toggle("Appliquer le trim sur les colonnes de type chaîne"):
-            # Appliquer le trim uniquement sur les colonnes de type object (chaînes)
-            for col in df_clean.select_dtypes(include=['object']).columns:
-                df_clean[col] = df_clean[col].str.strip()
-            st.success("Espaces en trop supprimés.")
-
-        st.subheader("Aperçu du DataFrame nettoyé")
-
-
-        # Display the captured output as preformatted text
-        st.text([df_clean.size])
-        st.write(df_clean)
-        
-        df = df_clean
-    else:
-        st.info("Veuillez importer des données dans l'onglet 'Importation' pour commencer l'exportation.")
-
-# Onglet Configuration FTPS
-tabs[3].header("Configuration")
-with tabs[3]:
-    st.write("== Config SFTPS.==")
-    ftp_host = st.text_input("FTP Host")
-    ftp_port = st.number_input("FTP Port", min_value=1, max_value=65535, value=21)
-    ftp_user = st.text_input("FTP Username")
-    ftp_password = st.text_input("FTP Password", type="password")
-    ftp_directory = st.text_input("FTP Directory", value="/")
-    st.write("== Config serveur SQL .==")
-    SQL_host = st.text_input("SQL Host")
-    SQL_port = st.number_input("SQL Port", min_value=1, max_value=65535, value=3306 )
-    SQL_user = st.text_input("SQL Username")
-    SQL_password = st.text_input("SQL Password", type="password")
-    SQL_bdd = st.text_input("SQL Database name.", value="/")
-
-# Onglet Exportation
-tabs[2].header("Exportation des Fichiers")
-with tabs[2]:
-    if 'df' in locals() and df is not None:
-        # Sélection du format de conversion
-        export_format = st.selectbox("Choisissez un format de conversion :", ["CSV", "JSON", "SQL", "DB", "Excel"])
-
-        if export_format:
-            if export_format == "CSV":
-                # Choix du séparateur pour l'exportation
-                export_sep = st.text_input("Choisissez un séparateur pour l'exportation (par ex. ',' ou ';') :",
-                                           value=",")
-                buffer = StringIO()
-                df.to_csv(buffer, index=False, sep=export_sep)
-                file_data = buffer.getvalue().encode('utf-8')
-                filename = "converted_file.csv"
-            elif export_format == "JSON":
-                buffer = StringIO()
-                df.to_json(buffer, orient="records", indent=2)
-                file_data = buffer.getvalue().encode('utf-8')
-                filename = "converted_file.json"
-            elif export_format == "Excel":
-                buffer = BytesIO()
-                df.to_excel(buffer, index=False, engine='openpyxl')
-                file_data = buffer.getvalue()
-                filename = "converted_file.xlsx"
-            elif export_format == "DB":
-                conn = sqlite3.connect("converted_file.db")
-                table_name = st.text_input("Nom de la table pour l'export :", "exported_table")
-                df.to_sql(table_name, conn, if_exists="replace", index=False)
-                conn.close()
-                with open("converted_file.db", "rb") as f:
-                    file_data = f.read()
-                filename = "converted_file.db"
-
-            elif export_format == "SQL":
-                buffer = StringIO()
-                table_name = st.text_input("Nom de la table pour l'export :", "exported_table")
-                buffer.write(generate_sql(df, table_name))
-                file_data = buffer.getvalue().encode('utf-8')
-                filename = "converted_file.sql"
-
-            
-
-            # Section de téléchargements basiques
-            st.header("Téléchargement basique")
-            mime_type = 'text/csv' if export_format == "CSV" else 'application/json' if export_format == "JSON" else 'application/x-sqlite3' if export_format == "SQL" else 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            st.download_button(label=f"Télécharger le fichier {filename}", data=file_data, file_name=filename, mime=mime_type)
-
-            # Section d'exportation en FTPS
-            st.header("Exportation via FTPS")
-            if ftp_host and ftp_user and ftp_password:
-                if st.button("Exporter via FTPS"):
-                    print("[LOG] Connexion au serveur FTP...")
-                    try:
-                        with ftplib.FTP_TLS() as ftp:
-                            ftp.connect(host=ftp_host, port=ftp_port)
-                            ftp.login(user=ftp_user, passwd=ftp_password)
-                            ftp.prot_p()  # Activer le mode de protection
-                            ftp.cwd(ftp_directory)
-                            ftp.storbinary(f'STOR {filename}', BytesIO(file_data))
-                            st.success(f"Fichier sauvegardé sur le serveur FTP : {ftp_directory}/{filename}")
-                            print(f"[LOG] Fichier uploadé avec succès sur le serveur FTP : {ftp_directory}/{filename}")
-                    except Exception as e:
-                        st.error(f"Erreur lors de l'upload FTP : {e}")
-                        print(f"[LOG] Erreur lors de l'upload FTP : {e}")
-            else:
-                st.warning("Veuillez configurer les identifiants FTP dans l'onglet 'Configuration FTPS' pour utiliser l'exportation FTPS.")
-    else:
-        st.info("Veuillez importer des données dans l'onglet 'Importation' pour commencer l'exportation.")
+with tabselect["Exportation"]:
+    SK.exportation.exportation(df,ftp_host,ftp_port,ftp_user,ftp_password,ftp_directory)
 
 # Onglet Analyse de données avec Pandas Profiling
-tabs[4].header("Analyse des Données")
-with tabs[4]:
-    if 'df' in locals() and df is not None:
-        if st.button("Générer le rapport de profilage"):
-            profile = ProfileReport(df)
-            st_profile_report(profile, navbar=True)
-
-            # Ajouter un bouton pour télécharger le rapport de profilage au format HTML
-            html_report = profile.to_html()
-            st.download_button(label="Télécharger le rapport de profilage en HTML", data=html_report, file_name="profiling_report.html", mime="text/html")
-    else:
-        st.info("Veuillez importer des données dans l'onglet 'Importation' pour générer un rapport de profilage.")
+with tabselect["Analyse de données"]:
+    SK.analyse.analyse(df)
