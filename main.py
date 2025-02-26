@@ -36,12 +36,15 @@ st.set_page_config(page_title="Data_convertisseur",
 col1, col2 = st.columns([1,12])
 
 with col1:
-    st.image("http://89.86.5.13/img/logo.png", width=120)
+    st.image("./logo.png", width=120)
 with col2:
     st.header("Convertisseur de fichiers")
 
 # Créer des onglets pour l'importation et l'exportation
-tabs = st.tabs(["Importation", "Exportation", "Configuration", "Analyse de données"])
+tabs = st.tabs(["Importation","Netoyage", "Exportation", "Configuration", "Analyse de données"])
+
+
+
 
 # Onglet Importation
 tabs[0].header("Importation des Fichiers")
@@ -122,9 +125,78 @@ with tabs[0]:
     else:
         st.info("Veuillez charger un fichier pour commencer.")
 
+
+with tabs[1]:
+    st.header("Nettoyage du DataFrame")
+    if 'df' in locals() and df is not None:
+        st.subheader("1. Rognage (tranchage) des lignes")
+        # Choix des indices pour conserver une tranche de lignes
+        start_row = st.number_input("Indice de départ", min_value=0, max_value=len(df)-1, value=0, step=1)
+        end_row = st.number_input("Indice de fin", min_value=0, max_value=len(df), value=len(df), step=1)
+        df_clean = df.iloc[start_row:end_row].copy()  # On crée une copie pour éviter les modifications sur l'original
+
+        st.subheader("2. Rognage des colonnes")
+        # Sélection des colonnes à conserver
+        colonnes = df_clean.columns.tolist()
+        colonnes_a_conserver = st.multiselect("Sélectionnez les colonnes à conserver", colonnes, default=colonnes)
+        df_clean = df_clean[colonnes_a_conserver].copy()
+
+        st.subheader("3. Changement des types de colonnes")
+        # Pour chaque colonne, possibilité de choisir le type
+        for col in df_clean.columns:
+            type_actuel = df_clean[col].dtype
+            col_type = st.selectbox(f"Type pour la colonne '{col}' (actuel: {type_actuel})",
+                                    options=["None", "str", "int", "float", "bool"],
+                                    key=f"type_{col}")
+            if col_type != "None":
+                try:
+                    if col_type == "str":
+                        df_clean[col] = df_clean[col].astype(str)
+                    elif col_type == "int":
+                        df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce').astype("Int64")
+                    elif col_type == "float":
+                        df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce')
+                    elif col_type == "bool":
+                        df_clean[col] = df_clean[col].astype(bool)
+                except Exception as e:
+                    st.error(f"Erreur lors de la conversion de la colonne {col} en {col_type} : {e}")
+    
+
+        st.subheader("4. Suppression des doublons")
+        if st.toggle("Supprimer les doublons"):
+            df_clean = df_clean.drop_duplicates()
+            st.success("Doublons supprimés.")
+
+        st.subheader("5. Suppression des lignes avec valeurs nulles")
+        if st.toggle("Supprimer les lignes nulles"):
+            colonnes_a_conserver = st.multiselect("Sélectionnez les colonnes à conserver", df_clean.columns.tolist())
+            if colonnes_a_conserver:
+                df_clean = df_clean.dropna(subset=colonnes_a_conserver)
+                st.success("Lignes avec valeurs nulles supprimées.")
+            else:
+                st.warning("Veuillez sélectionner au moins une colonne.")
+
+        st.subheader("6. Nettoyage des espaces (Trim)")
+        if st.toggle("Appliquer le trim sur les colonnes de type chaîne"):
+            # Appliquer le trim uniquement sur les colonnes de type object (chaînes)
+            for col in df_clean.select_dtypes(include=['object']).columns:
+                df_clean[col] = df_clean[col].str.strip()
+            st.success("Espaces en trop supprimés.")
+
+        st.subheader("Aperçu du DataFrame nettoyé")
+
+
+        # Display the captured output as preformatted text
+        st.text([df_clean.size])
+        st.write(df_clean)
+        
+        df = df_clean
+    else:
+        st.info("Veuillez importer des données dans l'onglet 'Importation' pour commencer l'exportation.")
+
 # Onglet Configuration FTPS
-tabs[2].header("Configuration")
-with tabs[2]:
+tabs[3].header("Configuration")
+with tabs[3]:
     st.write("== Config SFTPS.==")
     ftp_host = st.text_input("FTP Host")
     ftp_port = st.number_input("FTP Port", min_value=1, max_value=65535, value=21)
@@ -139,8 +211,8 @@ with tabs[2]:
     SQL_bdd = st.text_input("SQL Database name.", value="/")
 
 # Onglet Exportation
-tabs[1].header("Exportation des Fichiers")
-with tabs[1]:
+tabs[2].header("Exportation des Fichiers")
+with tabs[2]:
     if 'df' in locals() and df is not None:
         # Sélection du format de conversion
         export_format = st.selectbox("Choisissez un format de conversion :", ["CSV", "JSON", "SQL", "DB", "Excel"])
@@ -175,7 +247,8 @@ with tabs[1]:
 
             elif export_format == "SQL":
                 buffer = StringIO()
-                buffer.write(generate_sql(df))
+                table_name = st.text_input("Nom de la table pour l'export :", "exported_table")
+                buffer.write(generate_sql(df, table_name))
                 file_data = buffer.getvalue().encode('utf-8')
                 filename = "converted_file.sql"
 
@@ -209,8 +282,8 @@ with tabs[1]:
         st.info("Veuillez importer des données dans l'onglet 'Importation' pour commencer l'exportation.")
 
 # Onglet Analyse de données avec Pandas Profiling
-tabs[3].header("Analyse des Données")
-with tabs[3]:
+tabs[4].header("Analyse des Données")
+with tabs[4]:
     if 'df' in locals() and df is not None:
         if st.button("Générer le rapport de profilage"):
             profile = ProfileReport(df)
