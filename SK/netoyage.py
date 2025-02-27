@@ -6,7 +6,7 @@ import numpy as np
 
 
 def netoyage(df):
-    if 'df' in locals() and df is not None:
+    if isinstance(df, pd.DataFrame) and not df.empty:
 
         st.subheader("Rognage (tranchage) des lignes")
         # Choix des indices pour conserver une tranche de lignes
@@ -16,7 +16,7 @@ def netoyage(df):
     
 
         st.subheader("Nettoyage des espaces (Trim)")
-        if st.toggle("Appliquer le trim sur les colonnes de type chaîne"):
+        if st.checkbox("Appliquer le trim sur les colonnes de type chaîne"):
             # Appliquer le trim uniquement sur les colonnes de type object (chaînes)
             for col in df_clean.select_dtypes(include=['object']).columns:
                 # Utiliser .astype(str) pour convertir les valeurs en chaînes, tout en préservant les NaN
@@ -26,7 +26,7 @@ def netoyage(df):
             
 
         st.subheader("Transformer la première ligne en noms de colonnes")
-        if st.toggle("Transformer la première ligne en noms de colonnes"):
+        if st.checkbox("Transformer la première ligne en noms de colonnes"):
             # Extraire la première ligne pour l'utiliser comme noms de colonnes
             new_columns = df_clean.iloc[0].fillna("Colonne_Inconnue").astype(str).tolist()
             
@@ -81,12 +81,12 @@ def netoyage(df):
 
 
         st.subheader("Suppression des doublons")
-        if st.toggle("Supprimer les doublons"):
+        if st.checkbox("Supprimer les doublons"):
             df_clean = df_clean.drop_duplicates()
             #st.success("Doublons supprimés.")
 
         st.subheader("Suppression des lignes avec valeurs nulles")
-        if st.toggle("Supprimer les lignes nulles"):
+        if st.checkbox("Supprimer les lignes nulles"):
             colonnes_a_conserver = st.multiselect("Sélectionnez les colonnes à conserver", df_clean.columns.tolist())
             if colonnes_a_conserver:
                 df_clean = df_clean.dropna(subset=colonnes_a_conserver)

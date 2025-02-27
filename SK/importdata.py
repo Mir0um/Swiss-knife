@@ -1,15 +1,29 @@
-    
+
 import streamlit as st
 import pandas as pd
 import json
 import csv
 import sqlite3
+import requests
+from io import StringIO, BytesIO
 
 def importdata():
     uploaded_file = st.file_uploader("Chargez un fichier (CSV, JSON, SQL, ou Excel)", type=["csv", "json", "sql", "xlsx", "xlsm", "xlsb", "odf"])
+    file_url = st.text_input("Ou entrez une URL pour charger un fichier (CSV, JSON, SQL, ou Excel)")
 
-    if uploaded_file:
-        file_type = uploaded_file.name.split('.')[-1]
+    if uploaded_file or file_url:
+        if uploaded_file:
+            file_type = uploaded_file.name.split('.')[-1]
+            file_content = uploaded_file.read()
+        else:
+            try:
+                response = requests.get(file_url)
+                response.raise_for_status()
+                file_type = file_url.split('.')[-1]
+                file_content = response.content
+            except requests.exceptions.RequestException as e:
+                st.error(f"Erreur lors du téléchargement du fichier : {e}")
+                return
 
         try:
             if file_type == "csv":
@@ -42,7 +56,7 @@ def importdata():
 
                 for decoder in decoders:
                     try:
-                        content = uploaded_file.read().decode(decoder, errors="ignore")
+                        content = file_content.decode(decoder, errors="ignore")
                         break
                     except UnicodeDecodeError:
                         continue
@@ -53,24 +67,23 @@ def importdata():
                     st.success(f"Séparateur détecté automatiquement : '{sep}'")
                 except Exception:
                     sep = st.text_input("Séparateur non détecté, entrez-le manuellement (par ex. ',' ou ';') :", value=",")
-                uploaded_file.seek(0)
-                df = pd.read_csv(uploaded_file, sep=sep)
-                namedf = uploaded_file.name.split('.')[0]  # Extraire le nom sans extension
+                df = pd.read_csv(StringIO(content), sep=sep)
+                namedf = file_url.split('/')[-1].split('.')[0] if file_url else uploaded_file.name.split('.')[0]
             elif file_type == "json":
-                data = json.load(uploaded_file)
+                data = json.loads(file_content)
                 df = pd.json_normalize(data)
-                namedf = uploaded_file.name.split('.')[0]
+                namedf = file_url.split('/')[-1].split('.')[0] if file_url else uploaded_file.name.split('.')[0]
             elif file_type in ["xlsx", "xlsm", "xlsb", "odf"]:
-                excel_file = pd.ExcelFile(uploaded_file)
+                excel_file = pd.ExcelFile(BytesIO(file_content))
                 sheet_name = st.selectbox("Sélectionnez une feuille :", excel_file.sheet_names)
-                df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
-                namedf = f"{uploaded_file.name.split('.')[0]}_{sheet_name}"
+                df = pd.read_excel(BytesIO(file_content), sheet_name=sheet_name)
+                namedf = f"{file_url.split('/')[-1].split('.')[0]}_{sheet_name}" if file_url else f"{uploaded_file.name.split('.')[0]}_{sheet_name}"
             elif file_type == "sql":
-                conn = sqlite3.connect(uploaded_file)
+                conn = sqlite3.connect(BytesIO(file_content))
                 tables = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table';", conn)
                 table_name = st.selectbox("Sélectionnez une table :", tables['name'])
                 df = pd.read_sql(f"SELECT * FROM {table_name};", conn)
-                namedf = f"{uploaded_file.name.split('.')[0]}_{table_name}"
+                namedf = f"{file_url.split('/')[-1].split('.')[0]}_{table_name}" if file_url else f"{uploaded_file.name.split('.')[0]}_{table_name}"
                 conn.close()
             else:
                 st.error("Type de fichier non pris en charge.")
@@ -84,12 +97,8 @@ def importdata():
                 st.write("nombre de ligne : " , df.shape[0] , " et de colone", df.shape[1])
                 st.dataframe(df)
             
-            
-            return df, namedf
+            return df
         except Exception as e:
             st.error(f"Erreur lors du traitement : {e}")
     else:
-        st.info("Veuillez charger un fichier pour commencer.")
-
-
-
+        st.info("Veuillez charger un fichier ou entrer une URL pour commencer.")
