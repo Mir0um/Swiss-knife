@@ -90,3 +90,6 @@ def importdata():
             st.error(f"Erreur lors du traitement : {e}")
     else:
         st.info("Veuillez charger un fichier pour commencer.")
+
+
+
