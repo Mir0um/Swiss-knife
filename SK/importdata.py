@@ -55,31 +55,37 @@ def importdata():
                     sep = st.text_input("Séparateur non détecté, entrez-le manuellement (par ex. ',' ou ';') :", value=",")
                 uploaded_file.seek(0)
                 df = pd.read_csv(uploaded_file, sep=sep)
+                namedf = uploaded_file.name.split('.')[0]  # Extraire le nom sans extension
             elif file_type == "json":
                 data = json.load(uploaded_file)
                 df = pd.json_normalize(data)
+                namedf = uploaded_file.name.split('.')[0]
             elif file_type in ["xlsx", "xlsm", "xlsb", "odf"]:
                 excel_file = pd.ExcelFile(uploaded_file)
                 sheet_name = st.selectbox("Sélectionnez une feuille :", excel_file.sheet_names)
                 df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
+                namedf = f"{uploaded_file.name.split('.')[0]}_{sheet_name}"
             elif file_type == "sql":
                 conn = sqlite3.connect(uploaded_file)
                 tables = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table';", conn)
                 table_name = st.selectbox("Sélectionnez une table :", tables['name'])
                 df = pd.read_sql(f"SELECT * FROM {table_name};", conn)
+                namedf = f"{uploaded_file.name.split('.')[0]}_{table_name}"
                 conn.close()
             else:
                 st.error("Type de fichier non pris en charge.")
                 df = None
+                namedf = None
 
             if df is not None:
                 # Afficher un aperçu des données
+                st.write(f"Nom du DataFrame : {namedf}")
                 st.write("Aperçu des données :")
                 st.write("nombre de ligne : " , df.shape[0] , " et de colone", df.shape[1])
                 st.dataframe(df)
             
             
-            return df
+            return df, namedf
         except Exception as e:
             st.error(f"Erreur lors du traitement : {e}")
     else:
