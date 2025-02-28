@@ -1,3 +1,12 @@
+```   
+   _____         _                _  __      _  __     
+  / ____|       (_)              | |/ /     (_)/ _|    
+ | (_____      ___ ___ ___ ______| ' / _ __  _| |_ ___ 
+  \___ \ \ /\ / / / __/ __|______|  < | '_ \| |  _/ _ \
+  ____) \ V  V /| \__ \__ \      | . \| | | | | ||  __/
+ |_____/ \_/\_/ |_|___/___/      |_|\_\_| |_|_|_| \___|                                                                                                                  
+```
+
 # Swiss-Knife
 
 Swiss-Knife est une application Web réalisée en Python (compatible avec Python 3.9.12) qui offre une solution tout-en-un pour l'importation, la conversion, l'exportation et l'analyse de fichiers de données. Grâce à une interface utilisateur construite avec Streamlit, l’application permet de charger différents formats de fichiers (CSV, JSON, SQL, Excel), de les convertir en divers formats et de générer des rapports de profilage de données détaillés.

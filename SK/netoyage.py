@@ -5,7 +5,7 @@ from collections import Counter
 import numpy as np
 
 
-def netoyage(df):
+def nettoyage(df):
     if 'df' in locals() and df is not None:
 
         st.subheader("Rognage (tranchage) des lignes")
