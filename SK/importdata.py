@@ -1,62 +1,39 @@
-
 import streamlit as st
 import pandas as pd
 import json
 import csv
 import sqlite3
-import requests
-from io import StringIO, BytesIO
+import re
+from unidecode import unidecode
 
-def importdata():
+def _nettoyer_chaine(chaine):
+    # Remplacer les espaces par des underscores
+    chaine = chaine.replace(' ', '_')
+    # Supprimer les accents
+    chaine = unidecode(chaine)
+    # Supprimer les caractères non alphanumériques et les underscores
+    chaine = re.sub(r'[^a-zA-Z0-9_]', '', chaine)
+    return chaine
+
+def add_df():
+    st.header("Ajouter un nouveau jeux de donner")
     uploaded_file = st.file_uploader("Chargez un fichier (CSV, JSON, SQL, ou Excel)", type=["csv", "json", "sql", "xlsx", "xlsm", "xlsb", "odf"])
-    file_url = st.text_input("Ou entrez une URL pour charger un fichier (CSV, JSON, SQL, ou Excel)")
+    if uploaded_file:
+        file_type = uploaded_file.name.split('.')[-1]
+        try:            
+            dfName = getattr(uploaded_file, 'name', 'DF').split('.')[0]
 
-    if uploaded_file or file_url:
-        if uploaded_file:
-            file_type = uploaded_file.name.split('.')[-1]
-            file_content = uploaded_file.read()
-        else:
-            try:
-                response = requests.get(file_url)
-                response.raise_for_status()
-                file_type = file_url.split('.')[-1]
-                file_content = response.content
-            except requests.exceptions.RequestException as e:
-                st.error(f"Erreur lors du téléchargement du fichier : {e}")
-                return
-
-        try:
             if file_type == "csv":
                 # Détection automatique du séparateur
-                decoders = encodings = [
-                                        'ascii',        # Encodage ASCII standard
-                                        'utf-8',        # Encodage Unicode standard
-                                        'utf-16',       # Encodage Unicode sur 2 ou 4 octets
-                                        'utf-32',       # Encodage Unicode sur 4 octets
-                                        'latin-1',      # Encodage ISO-8859-1 pour les langues d'Europe occidentale
-                                        'cp1252',       # Encodage Windows pour les langues d'Europe occidentale
-                                        'iso-8859-15',  # Variante de l'ISO-8859-1 avec le symbole de l'euro
-                                        'mac-roman',    # Encodage utilisé sur les anciens systèmes Mac
-                                        'big5',         # Encodage pour le chinois traditionnel
-                                        'gb2312',       # Encodage pour le chinois simplifié
-                                        'shift_jis',    # Encodage pour le japonais
-                                        'euc-jp',       # Encodage pour le japonais
-                                        'euc-kr',       # Encodage pour le coréen
-                                        'koi8-r',       # Encodage pour le russe
-                                        'cp866',        # Encodage DOS pour le russe
-                                        'cp850',        # Encodage DOS pour l'Europe occidentale
-                                        'cp437',        # Encodage DOS original
-                                        'utf-7',        # Encodage Unicode obsolète
-                                        'utf-8-sig',    # UTF-8 avec marque d'ordre d'octet (BOM)
-                                        'utf-16-be',    # UTF-16 big-endian
-                                        'utf-16-le',    # UTF-16 little-endian
-                                        'utf-32-be',    # UTF-32 big-endian
-                                        'utf-32-le',    # UTF-32 little-endian
-                                    ]
-
+                decoders = [
+                    'ascii', 'utf-8', 'utf-16', 'utf-32', 'latin-1', 'cp1252',
+                    'iso-8859-15', 'mac-roman', 'big5', 'gb2312', 'shift_jis',
+                    'euc-jp', 'euc-kr', 'koi8-r', 'cp866', 'cp850', 'cp437',
+                    'utf-7', 'utf-8-sig', 'utf-16-be', 'utf-16-le', 'utf-32-be', 'utf-32-le'
+                ]
                 for decoder in decoders:
                     try:
-                        content = file_content.decode(decoder, errors="ignore")
+                        content = uploaded_file.read().decode(decoder, errors="ignore")
                         break
                     except UnicodeDecodeError:
                         continue
@@ -67,38 +44,94 @@ def importdata():
                     st.success(f"Séparateur détecté automatiquement : '{sep}'")
                 except Exception:
                     sep = st.text_input("Séparateur non détecté, entrez-le manuellement (par ex. ',' ou ';') :", value=",")
-                df = pd.read_csv(StringIO(content), sep=sep)
-                namedf = file_url.split('/')[-1].split('.')[0] if file_url else uploaded_file.name.split('.')[0]
+                uploaded_file.seek(0)
+                df = pd.read_csv(uploaded_file, sep=sep)
+                # Pour un CSV, le dfName est défini à partir du nom du fichier
+                dfName = getattr(uploaded_file, 'name', 'CSV').split('.')[0]
+
             elif file_type == "json":
-                data = json.loads(file_content)
+                data = json.load(uploaded_file)
                 df = pd.json_normalize(data)
-                namedf = file_url.split('/')[-1].split('.')[0] if file_url else uploaded_file.name.split('.')[0]
+                # Pour un JSON, le dfName est également défini à partir du nom du fichier
+                dfName = getattr(uploaded_file, 'name', 'JSON').split('.')[0]
+
             elif file_type in ["xlsx", "xlsm", "xlsb", "odf"]:
-                excel_file = pd.ExcelFile(BytesIO(file_content))
+                excel_file = pd.ExcelFile(uploaded_file)
                 sheet_name = st.selectbox("Sélectionnez une feuille :", excel_file.sheet_names)
-                df = pd.read_excel(BytesIO(file_content), sheet_name=sheet_name)
-                namedf = f"{file_url.split('/')[-1].split('.')[0]}_{sheet_name}" if file_url else f"{uploaded_file.name.split('.')[0]}_{sheet_name}"
+                df = pd.read_excel(uploaded_file, sheet_name=sheet_name)
+                # Ici, le dfName correspond à la feuille sélectionnée
+                dfName = sheet_name
+
             elif file_type == "sql":
-                conn = sqlite3.connect(BytesIO(file_content))
+                conn = sqlite3.connect(uploaded_file)
                 tables = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table';", conn)
                 table_name = st.selectbox("Sélectionnez une table :", tables['name'])
                 df = pd.read_sql(f"SELECT * FROM {table_name};", conn)
-                namedf = f"{file_url.split('/')[-1].split('.')[0]}_{table_name}" if file_url else f"{uploaded_file.name.split('.')[0]}_{table_name}"
                 conn.close()
+                # Pour SQL, le dfName correspond à la table sélectionnée
+                dfName = table_name
+
             else:
                 st.error("Type de fichier non pris en charge.")
                 df = None
-                namedf = None
+
+
+            col21, col22 = st.columns([1,2])
+
+    
+            with col22:
+                dfName = st.text_input("dataframe Name:" , _nettoyer_chaine(dfName))
+            with col21:
+                if dfName == _nettoyer_chaine(dfName):
+                    st.text("enregistrement du DataFrame")
+                    if st.button("valider les donner pour paser a la suit"):
+                        if 'dfs' in st.session_state:    
+                            dfs = st.session_state.dfs
+                            dfs[dfName] = df
+                            st.session_state.dfs = dfs                
+                        else:                    
+                            st.session_state.dfs = {dfName : df}
+                        st.rerun()
+                else:
+                    st.info("Veuillez n'utiliser que des lettres, des chiffres, des traits d'union (-) et des underscores (_) dans les noms de fichiers ou de dossiers. Les caractères spéciaux tels que < > : \" / \ | ? * ainsi que les accents (é, è, à, etc.) ne sont pas autorisés.")
+
 
             if df is not None:
                 # Afficher un aperçu des données
-                st.write(f"Nom du DataFrame : {namedf}")
+                st.write("Nombre de lignes :", df.shape[0], " et de colonnes :", df.shape[1])
                 st.write("Aperçu des données :")
-                st.write("nombre de ligne : " , df.shape[0] , " et de colone", df.shape[1])
                 st.dataframe(df)
-            
-            return df
+                # Stocker le DataFrame dans la session pour le garder lors d'un rafraîchissement
+                
+
+        
         except Exception as e:
             st.error(f"Erreur lors du traitement : {e}")
     else:
-        st.info("Veuillez charger un fichier ou entrer une URL pour commencer.")
+        st.info("Veuillez charger un fichier pour commencer.")
+
+def importdata():
+
+    # On vérifie si le DataFrame a déjà été chargé
+    if 'dfs' in st.session_state and not st.session_state['dfs'] == {} :
+        col1, col2 = st.columns([1,1])
+        dfs = st.session_state.dfs
+
+        with col1:
+            for _, keyname in enumerate(st.session_state.dfs):
+                df = st.session_state.dfs
+                col11, col12 = st.columns([1,1])
+                with col11:
+                        st.write("Nombre de lignes :", df[keyname].shape[0], " et de colonnes :", df[keyname].shape[1])
+                
+                
+                with col12:
+                    if st.button(f"Supirimer '{keyname}'"):
+                        dfs.pop(keyname)
+                        st.text(type(dfs))
+                        st.rerun()
+                
+                st.dataframe(df[keyname])
+        
+        with col2:
+            add_df()
