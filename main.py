@@ -1,9 +1,10 @@
 import streamlit as st
 import SK.head
 import SK.importdata   
-import SK.netoyage
+import SK.nettoyage
 import SK.exportation
 import SK.analyse
+import SK.transformation
 
 # Configuration de la page
 st.set_page_config(page_title="Data_convertisseur",
@@ -36,28 +37,44 @@ with st.sidebar:
         SQL_password = st.text_input("SQL Password", type="password")
         SQL_bdd = st.text_input("SQL Database name.", value="/")
 
-
-
-# Créer des onglets pour l'importation et l'exportation
-tabsName = ["Importation","Netoyage", "Exportation", "Analyse de données"]
-tabs = st.tabs(tabsName)
-
-tabselect = {}
-for num, i in enumerate( tabs):
-    tabselect[tabsName[num]] = i
-
-
-with tabselect["Importation"]: 
-    df = SK.importdata.importdata()
-
-
-with tabselect["Netoyage"]:
-    df = SK.netoyage.netoyage(df)
+def select_DF(key):
+    """Permet à l'utilisateur de sélectionner un DataFrame stocké en session."""
+    dfs = st.session_state.get("dfs", {})
+    if not dfs:
+        st.warning("Aucun DataFrame disponible. Veuillez importer des données.")
+        return None
     
+    dfname = st.selectbox("Sélectionnez votre dataset :", list(dfs.keys()), 0, key=key)
+    st.session_state.dfname = dfname
+    df = dfs[dfname]
+    st.write("---")
+    return df
 
-with tabselect["Exportation"]:
-    SK.exportation.exportation(df,ftp_host,ftp_port,ftp_user,ftp_password,ftp_directory)
+if 'dfs' in st.session_state and st.session_state['dfs']:
+    # Création des onglets
+    onglets = ["Importation", "Nettoyage", "Transformation", "Exportation", "Analyse de données"]
+    tabs = st.tabs(onglets)
+    
+    # Association des onglets à leurs noms
+    onglets_dict = {nom: tab for nom, tab in zip(onglets, tabs)}
 
-# Onglet Analyse de données avec Pandas Profiling
-with tabselect["Analyse de données"]:
-    SK.analyse.analyse(df)
+    # Onglet Importation (pas de sélection de DataFrame ici)
+    with onglets_dict["Importation"]:
+        SK.importdata.importdata()
+
+    # Appliquer la sélection du DataFrame dans les autres onglets
+    for onglet in ["Nettoyage", "Transformation", "Exportation", "Analyse de données"]:
+        with onglets_dict[onglet]:
+            df = select_DF(key=f"apelle_{onglet}")  # Clé unique par onglet pour éviter les conflits
+            if df is not None:  # Vérifier si un DF est sélectionné avant de l'utiliser
+                if onglet == "Nettoyage":
+                    SK.nettoyage.nettoyage(df)
+                elif onglet == "Transformation":
+                    SK.transformation.transformation(df)
+                elif onglet == "Exportation":
+                    SK.exportation.exportation(df, ftp_host, ftp_port, ftp_user, ftp_password, ftp_directory)
+                elif onglet == "Analyse de données":
+                    SK.analyse.analyse(df)
+else:
+    # Si aucun DataFrame n'est présent, afficher l'interface d'importation
+    SK.importdata.add_df()
