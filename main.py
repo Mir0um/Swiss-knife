@@ -74,7 +74,7 @@ if 'dfs' in st.session_state and st.session_state['dfs']:
                 elif onglet == "Exportation":
                     SK.exportation.exportation(df, ftp_host, ftp_port, ftp_user, ftp_password, ftp_directory, dfname)
                 elif onglet == "Analyse de données":
-                    SK.analyse.analyse(df)
+                    SK.analyse.analyse(df, dfname)
 else:
     # Si aucun DataFrame n'est présent, afficher l'interface d'importation
     st.title("Bienvenue sur Swiss-Knife")
