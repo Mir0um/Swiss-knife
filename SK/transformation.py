@@ -1,10 +1,13 @@
 import streamlit as st
 import pandasql as ps
+import SK.savedf
 
-def transformation(df):
+def transformation(df, dfName):
     if 'df' in locals() and df is not None:
-
-        with st.expander("Assistant de Création de Requête SQL"):
+    
+        tabSQL, tabRegex = st.tabs(["Assistant de Création de Requête SQL", "Expression régulière (regex)"])
+        
+        with tabSQL:
             st.title("Assistant SQL sans Connaissances en SQL")
             st.write("Construisez votre requête en cliquant sur les options ci-dessous.")
 
@@ -13,12 +16,13 @@ def transformation(df):
             df_main = st.session_state.dfs[main_table]
 
             # Onglets pour structurer la démarche
-            tab_jointure, tab_colonnes, tab_filtres, tab_aggregations, tab_group_order = st.tabs([
+            tab_jointure, tab_colonnes, tab_filtres, tab_aggregations, tab_group_order, tab_editsql = st.tabs([
                 "Jointure",
                 "Colonnes",
                 "Filtres",
                 "Agrégations",
-                "Group By & Order By"
+                "Group By & Order By",
+                "Editer la requête",
             ])
 
             # ----- Onglet Jointure -----
@@ -148,12 +152,12 @@ def transformation(df):
             if order_by_col != "Aucune":
                 query += f"\nORDER BY \"{order_by_col}\" {order_direction}"
 
-            st.subheader("Requête SQL Générée")
-            tabsqlgauche, tabsqldroit  = st.columns([1,1])
+            with tab_editsql:
+                st.subheader("Requête SQL Générée:")            
+                query = st.text_area("Vous pouvez modifier la requête SQL", value=query, height=150, key="sql_generated")
             
-            query = tabsqlgauche.text_area("Requête SQL", value=query, height=150, key="sql_generated")
-            tabsqldroit.text("aide vusuele.")
-            tabsqldroit.code(query, language="sql")
+            st.text("visualisation de la requête")
+            st.code(query, language="sql")
 
             if st.button("Exécuter la requête"):
                 try:
@@ -161,10 +165,12 @@ def transformation(df):
                     result = ps.sqldf(query, dfs)
                     st.success("Requête exécutée avec succès !")
                     st.dataframe(result)
+
+                    SK.savedf.savedf(result, dfName + "_SQL_transformé")
                 except Exception as e:
                     st.error(f"Erreur lors de l'exécution de la requête SQL : {str(e)}")
 
-        with st.expander("Expression régulière (regex)"):
+        with tabRegex:
             st.text("en cour de dev")
     else:
         st.info("Veuillez importer des données dans l'onglet 'Importation' pour générer un rapport de profilage.")
