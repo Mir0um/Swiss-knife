@@ -65,16 +65,14 @@ def add_df():
                 st.error("Type de fichier non pris en charge.")
                 df = None
 
-
-            SK.savedf.savedf(df, dfName, rerun=True)
-
             if df is not None:
                 # Afficher un aperçu des données
                 st.write("Nombre de lignes :", df.shape[0], " et de colonnes :", df.shape[1])
                 st.write("Aperçu des données :")
                 st.dataframe(df)
                 # Stocker le DataFrame dans la session pour le garder lors d'un rafraîchissement
-                
+            
+            SK.savedf.savedf(df, dfName, rerun=True)
 
         
         except Exception as e:
