@@ -48,7 +48,7 @@ def select_DF(key):
     st.session_state.dfname = dfname
     df = dfs[dfname]
     st.write("---")
-    return df
+    return df, dfname
 
 if 'dfs' in st.session_state and st.session_state['dfs']:
     # Création des onglets
@@ -65,14 +65,14 @@ if 'dfs' in st.session_state and st.session_state['dfs']:
     # Appliquer la sélection du DataFrame dans les autres onglets
     for onglet in ["Nettoyage", "Transformation", "Exportation", "Analyse de données"]:
         with onglets_dict[onglet]:
-            df = select_DF(key=f"apelle_{onglet}")  # Clé unique par onglet pour éviter les conflits
+            df, dfname = select_DF(key=f"apelle_{onglet}")  # Clé unique par onglet pour éviter les conflits
             if df is not None:  # Vérifier si un DF est sélectionné avant de l'utiliser
                 if onglet == "Nettoyage":
-                    SK.nettoyage.nettoyage(df)
+                    SK.nettoyage.nettoyage(df, dfname)
                 elif onglet == "Transformation":
-                    SK.transformation.transformation(df)
+                    SK.transformation.transformation(df, dfname)
                 elif onglet == "Exportation":
-                    SK.exportation.exportation(df, ftp_host, ftp_port, ftp_user, ftp_password, ftp_directory)
+                    SK.exportation.exportation(df, ftp_host, ftp_port, ftp_user, ftp_password, ftp_directory, dfname)
                 elif onglet == "Analyse de données":
                     SK.analyse.analyse(df)
 else:

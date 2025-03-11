@@ -3,17 +3,7 @@ import pandas as pd
 import json
 import csv
 import sqlite3
-import re
-from unidecode import unidecode
-
-def _nettoyer_chaine(chaine):
-    # Remplacer les espaces par des underscores
-    chaine = chaine.replace(' ', '_')
-    # Supprimer les accents
-    chaine = unidecode(chaine)
-    # Supprimer les caractères non alphanumériques et les underscores
-    chaine = re.sub(r'[^a-zA-Z0-9_]', '', chaine)
-    return chaine
+import SK.savedf
 
 def add_df():
     st.header("Ajouter un nouveau jeux de donner")
@@ -76,25 +66,7 @@ def add_df():
                 df = None
 
 
-            col21, col22 = st.columns([1,2])
-
-    
-            with col22:
-                dfName = st.text_input("dataframe Name:" , _nettoyer_chaine(dfName))
-            with col21:
-                if dfName == _nettoyer_chaine(dfName):
-                    st.text("enregistrement du DataFrame")
-                    if st.button("valider les donner pour paser a la suit"):
-                        if 'dfs' in st.session_state:    
-                            dfs = st.session_state.dfs
-                            dfs[dfName] = df
-                            st.session_state.dfs = dfs                
-                        else:                    
-                            st.session_state.dfs = {dfName : df}
-                        st.rerun()
-                else:
-                    st.info("Veuillez n'utiliser que des lettres, des chiffres, des traits d'union (-) et des underscores (_) dans les noms de fichiers ou de dossiers. Les caractères spéciaux tels que < > : \" / \ | ? * ainsi que les accents (é, è, à, etc.) ne sont pas autorisés.")
-
+            SK.savedf.savedf(df, dfName, rerun=True)
 
             if df is not None:
                 # Afficher un aperçu des données
