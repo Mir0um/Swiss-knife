@@ -14,7 +14,10 @@ st.set_page_config(page_title="Data_convertisseur",
                     menu_items={
                         'Get Help': 'https://github.com/Mir0um/Swiss-knife/help',
                         'Report a bug': "https://github.com/Mir0um/Swiss-knife/issues",
-                        'About': "Nom du projet : Swiss-knife \n# Version : 1.3.0\n Collaborateurs : GregTic, Laien WU, n-popy, Mir0um\n Ce projet est pour une formation, notre du formateur : Gaetan C."
+                        'About': """Nom du projet : **Swiss-knife** 
+                            \r\rVersion : **1.3.0** 
+                            \r\rCollaborateurs : **GregTic**, **Laien WU**, **n-popy**, **Mir0um** 
+                            \r\r Ce projet est pour une formation, notre du formateur : **Gaetan C**."""
                     }
                    )
 
