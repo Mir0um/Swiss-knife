@@ -69,11 +69,10 @@ def add_df():
                 # Afficher un aperçu des données
                 st.write("Nombre de lignes :", df.shape[0], " et de colonnes :", df.shape[1])
                 st.write("Aperçu des données :")
-                st.dataframe(df)
+                st.dataframe(df, height=200, hide_index=True)
                 # Stocker le DataFrame dans la session pour le garder lors d'un rafraîchissement
             
             SK.savedf.savedf(df, dfName, rerun=True)
-
         
         except Exception as e:
             st.error(f"Erreur lors du traitement : {e}")
