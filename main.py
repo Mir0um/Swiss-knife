@@ -11,11 +11,11 @@ st.set_page_config(page_title="Data_convertisseur",
                     page_icon="http://89.86.5.13/img/logo.png",
                     layout="wide",
                     initial_sidebar_state="collapsed",
-                    #menu_items={
-                    #        'Get Help': 'https://www.extremelycoolapp.com/help',
-                    #        'Report a bug': "https://www.extremelycoolapp.com/bug",
-                    #        'About': "# This is a header. This is an *extremely* cool app!"
-                    #    }
+                    menu_items={
+                        'Get Help': 'https://github.com/Mir0um/Swiss-knife/help',
+                        'Report a bug': "https://github.com/Mir0um/Swiss-knife/issues",
+                        'About': "Nom du projet : Swiss-knife \n# Version : 1.3.0\n Collaborateurs : GregTic, Laien WU, n-popy, Mir0um\n Ce projet est pour une formation, notre du formateur : Gaetan C."
+                    }
                    )
 
 
@@ -77,4 +77,8 @@ if 'dfs' in st.session_state and st.session_state['dfs']:
                     SK.analyse.analyse(df)
 else:
     # Si aucun DataFrame n'est présent, afficher l'interface d'importation
+    st.title("Bienvenue sur Swiss-Knife")
+    st.markdown("<h3 style='color: lightblue;'>Une solution tout-en-un pour vos données</h3>", unsafe_allow_html=True)
+    st.write("Swiss-Knife est une application Web réalisée en Python (compatible avec Python 3.9.12) qui offre une solution tout-en-un pour l'importation, la conversion, l'exportation et l'analyse de fichiers de données.")
+    st.markdown("<p style='color: lightgreen;'>Grâce à une interface utilisateur construite avec Streamlit, l’application permet de charger différents formats de fichiers (CSV, JSON, SQL, Excel), de les convertir en divers formats et de générer des rapports de profilage de données détaillés.</p>", unsafe_allow_html=True)
     SK.importdata.add_df()
