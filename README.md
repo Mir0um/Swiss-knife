@@ -47,7 +47,7 @@ Swiss-Knife est une application Web réalisée en Python (compatible avec Python
 1. **Cloner le dépôt :**
 
    ```bash
-   git clone https://votre-repo-url.git
+   git clone https://github.com/Mir0um/Swiss-knife.git
    cd swiss-knife
    ```
 
