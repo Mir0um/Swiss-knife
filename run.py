@@ -1,3 +1,11 @@
+# ██████╗ ██╗   ██╗███╗   ██╗   ██████╗ ██╗   ██╗
+# ██╔══██╗██║   ██║████╗  ██║   ██╔══██╗╚██╗ ██╔╝
+# ██████╔╝██║   ██║██╔██╗ ██║   ██████╔╝ ╚████╔╝ 
+# ██╔══██╗██║   ██║██║╚██╗██║   ██╔═══╝   ╚██╔╝  
+# ██║  ██║╚██████╔╝██║ ╚████║██╗██║        ██║   
+# ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝╚═╝        ╚═╝   
+#           run.py V1.0.1 27/03/2025
+
 import subprocess
 import sys
 import os
@@ -140,6 +148,7 @@ def run_streamlit_app(python_executable):
     print(f"    Pour interagir avec l'application, ouvrez votre navigateur et")
     print(f"    accédez à l'URL suivante : {Color.print_rgb(f'http://localhost:{port}/',128,128,255)}")
     print(f"=======================================================================")
+    
     subprocess.run([python_executable, "-m", "streamlit", "run", "main.py"], capture_output=True, text=True, check=True)
 
 if __name__ == "__main__":
@@ -165,13 +174,11 @@ if __name__ == "__main__":
 
         port = _portis()
 
-        # Exécuter netstat avec encodage UTF-8
-        result = subprocess.run(["netstat", "-ano"], capture_output=True, text=True, check=True, encoding="utf-8", errors="ignore")
-
-        # Vérifie si le port apparaît dans le résultat
-        pru_used = port in result.stdout
+        # netstat -ano
         
-        if pru_used:
+        runinport =   _runinport(port)
+
+        if bool(runinport):
             runinport =   _runinport(port)
             input(Color.print_rgb(f"{'[ERROR]':-<10} L'aplication {runinport} est deja lancer sur le port:{port}.",255,128,128))
         else:
