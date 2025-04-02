@@ -143,7 +143,7 @@ def run_streamlit_app(python_executable):
 
     print(f"=======================================================================")
     print(f"    Information : La fenêtre de commande reste ouverte car elle héberge")
-    print(f"    l'application FX ETA en cours d'exécution.")
+    print(f"    l'application Swiss-knife en cours d'exécution.")
     print(f"    Ne la fermez pas tant que vous n'avez pas terminé l'usage l'application.")
     print(f"    Pour interagir avec l'application, ouvrez votre navigateur et")
     print(f"    accédez à l'URL suivante : {Color.print_rgb(f'http://localhost:{port}/',128,128,255)}")
