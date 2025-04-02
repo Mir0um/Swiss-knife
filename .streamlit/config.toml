@@ -1,7 +1,19 @@
 [theme]
-
 primaryColor="#226ab1"
 backgroundColor="#112d46"
 secondaryBackgroundColor="#464a64"
 textColor="#fafafa"
 font="sans serif"
+
+
+[server]
+#headless = true                     # Mode sans interface graphique
+port = 8502                         # Port d'écoute de l'application
+#enableCORS = false                  # Désactive le partage cross-origin
+#maxUploadSize = 0                   # Bloque l'upload de fichiers (si besoin)
+#enableXsrfProtection = true         # Protection contre les attaques CSRF  (Cross-Origin Resource Sharing)
+address = "LocalHost"               #  Définit l'adresse à laquelle Streamlit écoute les requêtes entrantes.
+
+
+[browser]
+#gatherUsageStats = false            # Désactive la collecte de données anonymes par Streamlit
