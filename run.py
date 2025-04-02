@@ -154,7 +154,7 @@ def run_streamlit_app(python_executable):
 if __name__ == "__main__":
     # Se placer dans le dossier du script
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    os.system('title FX EAT')
+    os.system('title Swiss-knife')
     
     Color.clear_terminal()
 
