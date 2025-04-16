@@ -21,7 +21,8 @@ st.set_page_config(page_title="Data_convertisseur",
                     }
                    )
 
-
+# CSS personnalisé pour améliorer l'apparence
+st.html(f"<style>{open('style/style.css', 'r').read()}</style>")
 SK.head.head()
 
 with st.sidebar:
