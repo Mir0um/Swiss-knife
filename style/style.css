@@ -1,0 +1,237 @@
+/* Style CSS pour l'application Streamlit */
+/* Ce fichier contient les styles personnalisés pour l'application */
+
+/* 1. Définitions des polices */
+@font-face {
+  font-family: 'Calluna';
+  src: local('Calluna'), url('https://fonts.cdnfonts.com/s/24888/Shancalluna_regular.woff') format('woff');
+  /* Définition de la police personnalisée Calluna */
+}
+
+/* 2. Styles de base */
+html {
+  font-family: "Source Sans Pro", sans-serif;      /* Police principale du document */
+  font-size: 16px;                                 /* Taille de police de base */
+  * { border-radius: 0px !important }              /* Supprime tous les arrondis de bordure par défaut */
+}
+
+/* 3. Typographie */
+h1, h2, h3, h4, h5 {
+  font-family: calluna, serif;                     /* Applique la police Calluna aux titres */
+}
+.st-emotion-cache-1eev9jj h1 {
+  font-size: 30px;                                /* Taille de police spécifique pour les titres h1 */
+}
+
+/* 4. Boutons */
+.stButton, .stDownloadButton, .st-emotion-cache-909bza {
+  button {
+    display: inline-block;                         /* Affiche les boutons comme des blocs en ligne */
+    text-decoration: none;                         /* Supprime la décoration de texte (soulignement) */
+    transition: 0.3s ease;                         /* Ajoute une transition douce de 0.3s */
+    position: relative;                             /* Position relative pour le positionnement des pseudo-éléments */
+    overflow: hidden;                               /* Masque le contenu qui dépasse */
+    width: 100%;                                     /* Largeur du bouton à 61% */
+    max-width: 400px;                               /* Largeur maximale du bouton */
+    z-index: 1;                                     /* Assure que le bouton est au-dessus des autres éléments */
+    border-radius: 0px;                           /* Supprime l'arrondi des bordures */
+    padding: .9375rem 1.25rem;                    /* Espacement interne du bouton */
+    margin-top: 0;                               /* Marge au-dessus du bouton */
+    svg {color: red;}
+  }
+
+  button:hover {
+    font-weight: 100;                             /* Met le texte en gras au survol */
+  }
+
+  button::before {
+    animation: slideUp 0.15s forwards;            /* Anime le fond du bouton (glissement vers le haut) */
+    position: absolute;                             /* Position absolue pour couvrir le bouton */
+    height: 100%;                                   /* Hauteur à 100% */
+    width: 100%;                                    /* Largeur à 100% */
+    z-index: -1;                                    /* Place le pseudo-élément derrière le texte */
+    content: "";                                    /* Contenu vide obligatoire */
+    bottom: 0;                                      /* Aligne en bas */
+    left: 0;                                        /* Aligne à gauche */
+  }
+
+  button:hover::before {
+    animation: slideDown 0.15s forwards;          /* Anime le fond au survol (glissement vers le bas) */
+  }
+
+  button {
+    background-color: #ffffff;                     /* Fond blanc */
+    border: #cc9f53.125rem solid;                  /* Bordure dorée */
+    color: #2e3e80;                               /* Texte bleu foncé */
+    border-radius: 0.7em;                           /* Arrondi des bordures */
+    padding: 0.2em;                               /* Espacement interne */
+  }
+
+  button:hover {
+    background-color: #ffffff;                     /* Fond blanc au survol */
+  }
+
+  button::before {
+    background-color: #cc9f53;                     /* Fond doré pour l'effet de survol */
+  }
+}
+
+/* Animation pour le fond des boutons (glissement vers le haut) */
+@keyframes slideUp {
+  from {
+    transform: translateX(0);                     /* Position de départ */
+  }
+  to {
+    transform: translateX(-100%);                  /* Glisse vers la gauche pour masquer */
+  }
+}
+
+/* Animation pour faire descendre le fond (glissement vers le bas) */
+@keyframes slideDown {
+  from {
+    transform: translateX(100%);                  /* Position de départ (hors de l'écran à droite) */
+  }
+  to {
+    transform: translateX(0);                     /* Glisse vers la position initiale */
+  }
+}
+
+/* bouton dans les zone de selection */
+.st-emotion-cache-14zer8g{
+    color: #2e3e80;                              /* Couleur de texte bleu foncé au survol */
+}
+
+.st-emotion-cache-h1676u:hover{
+  border-color: #cc9f53;                         /* Couleur de bordure dorée au survol */
+  color: #2e3e80;                              /* Couleur de texte bleu foncé au survol */
+  font-weight: 100 !important;                   /* Poids de police léger au survol */
+}
+
+.stDownloadButton {
+  margin-top: 1em;                                 /* Supprime la marge supérieure */
+  text-align: center;                            /* Centre le texte */
+  p {font-size: 0.8em;} 
+}
+.stColumn .stButton {
+  text-align: center;                            /* Centre le bouton dans les colonnes */
+}
+
+/* 5. Entrées & Focus */
+.st-emotion-cache-q01qch.focused {
+  border-color: #efecea;                         /* Couleur de bordure au focus */
+}
+
+/* 6. Bordures & Conteneurs */
+.st-at, .st-aw, .st-au, .st-av, .st-cp, .st-c5, .st-b7, .st-b2, .st-b3, .st-ed, .st-ek, .st-el, .st-em, .st-en, .st-du, .st-dv, .st-dw, .st-dx, .st-eo, .st-b0, .st-dz, .st-cb, .st-fb, .st-fc, .st-fd, .st-fe, .st-bs, .st-df {
+  border-color: #efecea;                         /* Couleur de bordure des conteneurs */
+}
+.st-fq {
+  margin: 0;                                    /* Supprime les marges */
+}
+.st-emotion-cache-zaopnn {
+  border-radius: 50% !important;                 /* Arrondi complet pour créer un cercle */
+  border-color: rgb(28, 53, 94) rgba(78, 76, 73, 0.2) rgba(78, 76, 73, 0.2) !important; /* Couleur de bordure spécifique */
+}
+
+/* 7. En-tête & Barre d'outils de l'application */
+.stAppHeader {
+  background: transparent;                       /* Fond transparent */
+  z-index: 1;                                    /* Assure que l'en-tête est au-dessus des autres éléments */
+  background-color: #ffffff;                     /* Fond blanc */
+  height: 58px;                                  /* Hauteur de l'en-tête */
+}
+.stAppHeader::before {
+  text-align: center;                            /* Centre le texte */
+  margin-top: 23px;                              /* Marge au-dessus du texte */
+  position: absolute;                             /* Position absolue pour le positionnement */
+  width: 100%;                                   /* Largeur à 100% */
+}
+.stAppToolbar {
+  background: #ffffff00;                         /* Fond transparent */
+  border-radius: 0 0 0 0.5em;                    /* Arrondi le coin inférieur droit */
+  top: 10px;                                     /* Position depuis le haut */
+  right: -2px;                                   /* Position depuis la droite */
+  height: 3em;                                   /* Hauteur de la barre d'outils */
+  * { margin: 10px; }                            /* Marge interne */
+}
+.st-emotion-cache-1i6lr5d {
+  background: #ffffff00;                         /* Fond transparent */
+  border-radius: 0 0 0.5em 0;                    /* Arrondi le coin inférieur gauche */
+  top: 10px;                                     /* Position depuis le haut */
+  left: -2px;                                    /* Position depuis la gauche */
+  height: 2em;                                   /* Hauteur */
+  width: 1.8em;                                  /* Largeur */
+  * { margin: 10px; }                            /* Marge interne */
+}
+.stAppDeployButton {
+  display: none;                                 /* Masque le bouton de déploiement */
+}
+
+/* 8. Contenu principal & Mise en page */
+.stMainBlockContainer {
+  margin-top: 60px;                              /* Marge au-dessus du conteneur principal */
+  padding: 2em;                                  /* Espacement interne */
+  padding-top: 0;                                /* Supprime l'espacement interne en haut */
+  max-width: 100%;                               /* Largeur maximale à 100% */
+}
+.stVerticalBlock {
+  gap: 0;                                        /* Supprime l'espacement vertical */
+}
+
+/* 9. Style du code */
+.st-emotion-cache-k96zx2 {
+  font-family: monospace;                        /* Police monospace pour le code */
+  color: rgb(204, 159, 83);                      /* Couleur du texte */
+  background-color: #efecea;                     /* Fond du code */
+  padding: 1px;                              /* Espacement interne */
+  padding-right: 3px;
+  border-radius: 4px;                            /* Arrondi des bordures */
+  font-size: 0.95em;                             /* Taille de police */
+}
+
+/* 10. Divers */
+.st-emotion-cache-5ga3gr {
+  background: #cc9f53;                           /* Fond spécifique */
+}
+
+/* 11. Règle horizontale */
+.st-emotion-cache-1eev9jj hr { margin: 0; }      /* Supprime les marges de la règle horizontale */
+.st-emotion-cache-1eev9jj:has(hr) { margin: 1em 0; } /* Ajoute une marge si la règle horizontale est présente */
+
+/* 12. Barre de défilement */
+::-webkit-scrollbar {
+  width: 16px;                                   /* Largeur de la barre de défilement */
+  height: 16px;                                  /* Hauteur de la barre de défilement */
+}
+::-webkit-scrollbar-button {
+  width: 0px;                                    /* Supprime les boutons de la barre de défilement */
+  height: 0px;
+}
+::-webkit-scrollbar-thumb {
+  background: #7c838d;                           /* Couleur du "pouce" (la partie déplaçable) */
+  border: 0px none #ff6666;                      /* Supprime la bordure */
+  border-radius: 0;                              /* Supprime l'arrondi */
+}
+::-webkit-scrollbar-thumb:hover {
+  border-radius: 0;                              /* Supprime l'arrondi au survol */
+  background: #656f81;                           /* Couleur au survol */
+}
+::-webkit-scrollbar-thumb:active {
+  background: #1c355e;                           /* Couleur lorsque cliqué */
+}
+::-webkit-scrollbar-track {
+  background: #ffffff00;                         /* Fond transparent pour la "track" (le rail) */
+  border: 0px none #ffffff;                      /* Supprime la bordure */
+  border-radius: 0;                              /* Supprime l'arrondi */
+}
+::-webkit-scrollbar-track:hover {
+  border-radius: 0;                              /* Supprime l'arrondi au survol */
+  background: #ffffff00;                         /* Fond transparent au survol */
+}
+::-webkit-scrollbar-track:active {
+  border-radius: 0;                              /* Supprime l'arrondi lorsque cliqué */
+  background: #a1a1a1;                           /* Fond grisé lorsque cliqué */
+}
+::-webkit-scrollbar-corner {
+  background: transparent;                       /* Coin transparent */
+}
