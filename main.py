@@ -11,14 +11,18 @@ st.set_page_config(page_title="Data_convertisseur",
                     page_icon="http://89.86.5.13/img/logo.png",
                     layout="wide",
                     initial_sidebar_state="collapsed",
-                    #menu_items={
-                    #        'Get Help': 'https://www.extremelycoolapp.com/help',
-                    #        'Report a bug': "https://www.extremelycoolapp.com/bug",
-                    #        'About': "# This is a header. This is an *extremely* cool app!"
-                    #    }
+                    menu_items={
+                        'Get Help': 'https://github.com/Mir0um/Swiss-knife/help',
+                        'Report a bug': "https://github.com/Mir0um/Swiss-knife/issues",
+                        'About': """Nom du projet : **Swiss-knife** 
+                            \r\rVersion : **1.3.0** 
+                            \r\rCollaborateurs : **GregTic**, **Laien WU**, **n-popy**, **Mir0um** 
+                            \r\r Ce projet est pour une formation, notre du formateur : **Gaetan C**."""
+                    }
                    )
 
-
+# CSS personnalisé pour améliorer l'apparence
+st.html(f"<style>{open('style/style.css', 'r').read()}</style>")
 SK.head.head()
 
 with st.sidebar:
@@ -48,7 +52,7 @@ def select_DF(key):
     st.session_state.dfname = dfname
     df = dfs[dfname]
     st.write("---")
-    return df
+    return df, dfname
 
 if 'dfs' in st.session_state and st.session_state['dfs']:
     # Création des onglets
@@ -65,16 +69,20 @@ if 'dfs' in st.session_state and st.session_state['dfs']:
     # Appliquer la sélection du DataFrame dans les autres onglets
     for onglet in ["Nettoyage", "Transformation", "Exportation", "Analyse de données"]:
         with onglets_dict[onglet]:
-            df = select_DF(key=f"apelle_{onglet}")  # Clé unique par onglet pour éviter les conflits
+            df, dfname = select_DF(key=f"apelle_{onglet}")  # Clé unique par onglet pour éviter les conflits
             if df is not None:  # Vérifier si un DF est sélectionné avant de l'utiliser
                 if onglet == "Nettoyage":
-                    SK.nettoyage.nettoyage(df)
+                    SK.nettoyage.nettoyage(df, dfname)
                 elif onglet == "Transformation":
-                    SK.transformation.transformation(df)
+                    SK.transformation.transformation(df, dfname)
                 elif onglet == "Exportation":
-                    SK.exportation.exportation(df, ftp_host, ftp_port, ftp_user, ftp_password, ftp_directory)
+                    SK.exportation.exportation(df, ftp_host, ftp_port, ftp_user, ftp_password, ftp_directory, dfname)
                 elif onglet == "Analyse de données":
-                    SK.analyse.analyse(df)
+                    SK.analyse.analyse(df, dfname)
 else:
     # Si aucun DataFrame n'est présent, afficher l'interface d'importation
+    st.title("Bienvenue sur Swiss-Knife")
+    st.markdown("<h3 style='color: lightblue;'>Une solution tout-en-un pour vos données</h3>", unsafe_allow_html=True)
+    st.write("Swiss-Knife est une application Web réalisée en Python (compatible avec Python 3.9.12) qui offre une solution tout-en-un pour l'importation, la conversion, l'exportation et l'analyse de fichiers de données.")
+    st.markdown("<p style='color: lightgreen;'>Grâce à une interface utilisateur construite avec Streamlit, l’application permet de charger différents formats de fichiers (CSV, JSON, SQL, Excel), de les convertir en divers formats et de générer des rapports de profilage de données détaillés.</p>", unsafe_allow_html=True)
     SK.importdata.add_df()

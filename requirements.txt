@@ -1,6 +1,6 @@
 streamlit==1.42.1
 streamlit-pandas-profiling==0.1.3
-pandas-profiling==3.6.6
+pandas-profiling
 pandasql
 unidecode
 ipython
