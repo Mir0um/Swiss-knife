@@ -8,6 +8,7 @@ import SK.savedf
 def add_df():
     st.header("Ajouter un nouveau jeux de donner")
     uploaded_file = st.file_uploader("Chargez un fichier (CSV, JSON, SQL, ou Excel)", type=["csv", "json", "sql", "xlsx", "xlsm", "xlsb", "odf"])
+    st.selectbox("ou selectoner un groupe de travail", options=["Vous naver pas de groupe de travail"], index=0, disabled=True)
     if uploaded_file:
         file_type = uploaded_file.name.split('.')[-1]
         try:            
@@ -69,7 +70,8 @@ def add_df():
                 # Afficher un aperçu des données
                 st.write("Nombre de lignes :", df.shape[0], " et de colonnes :", df.shape[1])
                 st.write("Aperçu des données :")
-                st.dataframe(df, height=200, hide_index=True)
+                with st.spinner("Wait for it...", show_time=True):
+                    st.dataframe(df, height=200, hide_index=True)
                 # Stocker le DataFrame dans la session pour le garder lors d'un rafraîchissement
             
             SK.savedf.savedf(df, dfName, rerun=True)

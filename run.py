@@ -12,6 +12,7 @@ import os
 import json
 import subprocess
 import configparser
+import webbrowser
 import psutil
 
 class Color:
@@ -140,22 +141,24 @@ def check_and_install_requirements(python_executable):
 def run_streamlit_app(python_executable):
     """Lance l'application Streamlit avec l'exécutable du venv."""
 
+    # ourire la page web dans le navigateur par defaut
+    webbrowser.open(f"http://sartoris.dscloud.mobi:{port}/")
 
     print(f"=======================================================================")
     print(f"    Information : La fenêtre de commande reste ouverte car elle héberge")
     print(f"    l'application Swiss-knife en cours d'exécution.")
     print(f"    Ne la fermez pas tant que vous n'avez pas terminé l'usage l'application.")
     print(f"    Pour interagir avec l'application, ouvrez votre navigateur et")
-    print(f"    accédez à l'URL suivante : {Color.print_rgb(f'http://localhost:{port}/',128,128,255)}")
+    print(f"    accédez à l'URL suivante : {Color.print_rgb(f'http://sartoris.dscloud.mobi:{port}/',128,128,255)}")
     print(f"=======================================================================")
     
-    subprocess.run([python_executable, "-m", "streamlit", "run", "main.py"], capture_output=True, text=True, check=True)
+    subprocess.run([python_executable, "-m", "streamlit", "run", "main.py", "--server.port", str(port), "--server.headless", "true"], capture_output=True, text=True, check=True)
 
 if __name__ == "__main__":
     # Se placer dans le dossier du script
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     os.system('title Swiss-knife')
-    
+    port = _portis()
     Color.clear_terminal()
 
     print(Color.print_rgb("Checking for Python...",128,255,128))

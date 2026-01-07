@@ -1,18 +1,18 @@
 [theme]
-base="light"                        # Mode clair
-primaryColor="#1c355e"              # Bleu sobre comme couleur principale
-backgroundColor="#ffffff"           # Blanc en arrière-plan
-secondaryBackgroundColor="#efecea"  # Gris clair pour les zones secondaires
-textColor="#4e4c49"                 # Noir pour le texte
-font="sans serif"                   # Police sobre et lisible
+base="light"                            # Mode clair
+primaryColor="#1c355e"                  # Bleu sobre comme couleur principale
+backgroundColor="#ffffff"               # Blanc en arrière-plan
+secondaryBackgroundColor="#efecea"      # Gris clair pour les zones secondaires
+textColor="#4e4c49"                     # Noir pour le texte
+font="sans serif"                       # Police sobre et lisible
 
 [server]
-#headless = true                     # Mode sans interface graphique
-port = 8501                         # Port d'écoute de l'application
-#enableCORS = false                  # Désactive le partage cross-origin
-#maxUploadSize = 50000000                   # nimitation de la tailler des fichier en MB
-#enableXsrfProtection = true         # Protection contre les attaques CSRF  (Cross-Origin Resource Sharing)
-address = "LocalHost"               #  Définit l'adresse à laquelle Streamlit écoute les requêtes entrantes.
+#headless = true                        # Mode sans interface graphique
+port = 8567                             # Port d'écoute de l'application
+#enableCORS = false                     # Désactive le partage cross-origin
+#maxUploadSize = 50000000               # nimitation de la tailler des fichier en MB
+#enableXsrfProtection = true            # Protection contre les attaques CSRF  (Cross-Origin Resource Sharing)
+#address = "LocalHost"                   #  Définit l'adresse à laquelle Streamlit écoute les requêtes entrantes.
 
 [browser]
-#gatherUsageStats = false            # Désactive la collecte de données anonymes par Streamlit
+#gatherUsageStats = false               # Désactive la collecte de données anonymes par Streamlit
