@@ -1,0 +1,113 @@
+:root {
+  --skc-bg-color: #1a1a2e; /* Darker, more professional background */
+  --skc-text-color: #b7b6ff; /* Softer text color for readability */
+  --skc-border-color: #333333; /* Subtle border */
+  --skc-button-bg: #bbd7f3; /* Professional button background */
+  --skc-button-text: #000000; /* Black text for contrast */
+  --skc-button-hover-bg: #34495e; /* Hover effect */
+  --skc-accent-color: #3498db; /* Accent for highlights */
+  --skc-link-color: #5dade2; /* Link color */
+  --skc-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+body {
+  background-color: var(--skc-bg-color);
+  color: var(--skc-text-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  border-color: var(--skc-border-color);
+  line-height: 1.6; /* Improved readability */
+}
+
+/* Page background and color */
+.st-emotion-cache-153vojb {
+  background-color: var(--skc-bg-color);
+  color: var(--skc-text-color);
+  box-shadow: var(--skc-shadow); /* Added shadow for depth */
+}
+
+/* Padding adjustments */
+.st-emotion-cache-t1wise {
+  padding: 1.5rem; /* Consistent padding */
+  padding-top: 5rem; /* Extra top padding */
+}
+
+/* Host bar */
+.st-emotion-cache-12fmjuu {
+  background-color: transparent;
+  /* border-bottom: 1px solid var(--skc-border-color); */
+  backdrop-filter: blur(8px);
+
+  /* efaccer un boutin dev */
+  .st-emotion-cache-3r8jf4 {
+    display: none;
+  }
+}
+
+/* Professional button styles with animation */
+button, .st-emotion-cache-h1676u {
+  background-color: var(--skc-button-bg);
+  color: var(--skc-button-text);
+  border: 1px solid var(--skc-border-color);
+  padding: 0.75rem 1.5rem; /* Larger padding for better touch */
+  border-radius: 6px; /* Slightly rounded for modern look */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500; /* Semi-bold for emphasis */
+  box-shadow: var(--skc-shadow);
+}
+
+button:hover, .st-emotion-cache-h1676u:hover {
+  background-color: var(--skc-button-hover-bg);
+  color: var(--skc-button-text);
+  transform: translateY(-2px); /* Lift effect instead of scale */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+
+/* Additional professional touches */
+h1, h2, h3 {
+  color: var(--skc-accent-color);
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--skc-link-color);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Input styles for consistency with buttons */
+input {
+  background-color: var(--skc-bg-color);
+  color: var(--skc-text-color);
+  border: 1px solid var(--skc-border-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 500;
+  box-shadow: var(--skc-shadow);
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  background-color: var(--skc-button-bg);
+  color: var(--skc-button-text);
+  border-color: var(--skc-accent-color);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+input:hover {
+  border-color: var(--skc-button-hover-bg);
+}
+
+/* sidebar */
+.st-emotion-cache-1ph1e7s {
+  background-color: var(--skc-bg-color);
+  border-right: 1px solid var(--skc-border-color);
+}

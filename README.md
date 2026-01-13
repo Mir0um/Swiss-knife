@@ -1,13 +1,16 @@
 ```   
-   _____         _                    _  __      _  __     
-  / ____|       (_)                  | |/ /     (_)/ _|    
- | (_____      ___ ___ ___   ______  | ' / _ __  _| |_ ___ 
-  \___ \ \ /\ / / / __/ __/ |______| |  < | '_ \| |  _/ _ \
-  ____) \ V  V /| \__ \__ \          | . \| | | | | ||  __/
- |_____/ \_/\_/ |_|___/___/          |_|\_\_| |_|_|_| \___|                                                                                                                  
+███████╗██╗    ██╗██╗███████╗███████╗      ██╗  ██╗███╗   ██╗██╗███████╗███████╗ 
+██╔════╝██║    ██║██║██╔════╝██╔════╝      ██║ ██╔╝████╗  ██║██║██╔════╝██╔════╝
+███████╗██║ █╗ ██║██║███████╗███████╗█████╗█████╔╝ ██╔██╗ ██║██║█████╗  █████╗  
+╚════██║██║███╗██║██║╚════██║╚════██║╚════╝██╔═██╗ ██║╚██╗██║██║██╔══╝  ██╔══╝  
+███████║╚███╔███╔╝██║███████║███████║      ██║  ██╗██║ ╚████║██║██║     ███████╗
+╚══════╝ ╚══╝╚══╝ ╚═╝╚══════╝╚══════╝      ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝     ╚══════╝
 ```
 
 # Swiss-Knife
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
 Swiss-Knife est une application Web réalisée en Python (compatible avec Python 3.9.12) qui offre une solution tout-en-un pour l'importation, la conversion, l'exportation et l'analyse de fichiers de données. Grâce à une interface utilisateur construite avec Streamlit, l’application permet de charger différents formats de fichiers (CSV, JSON, SQL, Excel), de les convertir en divers formats et de générer des rapports de profilage de données détaillés.
 
@@ -47,7 +50,7 @@ Swiss-Knife est une application Web réalisée en Python (compatible avec Python
 1. **Cloner le dépôt :**
 
    ```bash
-   git clone https://votre-repo-url.git
+   git clone https://github.com/Mir0um/Swiss-knife.git
    cd swiss-knife
    ```
 
@@ -112,11 +115,24 @@ Un bouton de téléchargement vous permet de récupérer directement le fichier 
 
 ## Architecture du projet
 
-- **main.py** : Contient l’ensemble du code de l’interface et la logique de conversion/import/export.
-- **run.py** : Script pour lancer l’application avec Streamlit sur un port défini.
+- **main.py** : Point d'entrée principal de l'application Streamlit.
+- **run.py** : Script pour lancer l'application avec Streamlit sur un port défini.
 - **requirements.txt** : Liste des dépendances nécessaires pour faire fonctionner le projet.
 - **README.md** : Documentation du projet.
-- **logo.png** (non accessible dans ce contexte) : Image utilisée pour le logo de l’application.
+- **Dockerfile** : Configuration pour conteneuriser l'application avec Docker.
+- **LICENSE** : Fichier de licence du projet.
+- **data/** : Dossier contenant les fichiers de données exemple (e.g., data.csv).
+- **db/** : Module pour la gestion des bases de données (db.py).
+- **pages/** : Pages supplémentaires de l'application Streamlit (e.g., Nettoyage.py).
+- **SK/** : Module principal contenant la logique métier :
+  - **analyse.py** : Fonctions d'analyse de données.
+  - **exportation.py** : Logique d'exportation des données.
+  - **head.py** : Fonctions pour afficher l'en-tête ou aperçu des données.
+  - **importdata.py** : Logique d'importation des données.
+  - **nettoyage.py** : Fonctions de nettoyage des données.
+  - **savedf.py** : Sauvegarde des DataFrames.
+  - **transformation.py** : Transformations des données.
+- **style/** : Fichiers de style CSS (style.css) pour personnaliser l'interface.
 
 ## Dépendances
 

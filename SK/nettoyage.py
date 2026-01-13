@@ -3,9 +3,9 @@ import streamlit as st
 import pandas as pd
 from collections import Counter
 import numpy as np
+import SK.savedf
 
-
-def nettoyage(df):
+def nettoyage(df, dfName):
     if 'df' in locals() and df is not None:
 
         st.subheader("Rognage (tranchage) des lignes")
@@ -103,7 +103,7 @@ def nettoyage(df):
 
         st.write(df_clean)
         
-        df = df_clean
-        return df
+        SK.savedf.savedf(df_clean, dfName + "_nettoyé")
+
     else:
         st.info("Veuillez importer des données dans l'onglet 'Importation' pour commencer l'exportation.")

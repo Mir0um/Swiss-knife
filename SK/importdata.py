@@ -3,21 +3,12 @@ import pandas as pd
 import json
 import csv
 import sqlite3
-import re
-from unidecode import unidecode
-
-def _nettoyer_chaine(chaine):
-    # Remplacer les espaces par des underscores
-    chaine = chaine.replace(' ', '_')
-    # Supprimer les accents
-    chaine = unidecode(chaine)
-    # Supprimer les caractères non alphanumériques et les underscores
-    chaine = re.sub(r'[^a-zA-Z0-9_]', '', chaine)
-    return chaine
+import SK.savedf
 
 def add_df():
     st.header("Ajouter un nouveau jeux de donner")
     uploaded_file = st.file_uploader("Chargez un fichier (CSV, JSON, SQL, ou Excel)", type=["csv", "json", "sql", "xlsx", "xlsm", "xlsb", "odf"])
+    st.selectbox("ou selectoner un groupe de travail", options=["Vous naver pas de groupe de travail"], index=0, disabled=True)
     if uploaded_file:
         file_type = uploaded_file.name.split('.')[-1]
         try:            
@@ -75,35 +66,15 @@ def add_df():
                 st.error("Type de fichier non pris en charge.")
                 df = None
 
-
-            col21, col22 = st.columns([1,2])
-
-    
-            with col22:
-                dfName = st.text_input("dataframe Name:" , _nettoyer_chaine(dfName))
-            with col21:
-                if dfName == _nettoyer_chaine(dfName):
-                    st.text("enregistrement du DataFrame")
-                    if st.button("valider les donner pour paser a la suit"):
-                        if 'dfs' in st.session_state:    
-                            dfs = st.session_state.dfs
-                            dfs[dfName] = df
-                            st.session_state.dfs = dfs                
-                        else:                    
-                            st.session_state.dfs = {dfName : df}
-                        st.rerun()
-                else:
-                    st.info("Veuillez n'utiliser que des lettres, des chiffres, des traits d'union (-) et des underscores (_) dans les noms de fichiers ou de dossiers. Les caractères spéciaux tels que < > : \" / \ | ? * ainsi que les accents (é, è, à, etc.) ne sont pas autorisés.")
-
-
             if df is not None:
                 # Afficher un aperçu des données
                 st.write("Nombre de lignes :", df.shape[0], " et de colonnes :", df.shape[1])
                 st.write("Aperçu des données :")
-                st.dataframe(df)
+                with st.spinner("Wait for it...", show_time=True):
+                    st.dataframe(df, height=200, hide_index=True)
                 # Stocker le DataFrame dans la session pour le garder lors d'un rafraîchissement
-                
-
+            
+            SK.savedf.savedf(df, dfName, rerun=True)
         
         except Exception as e:
             st.error(f"Erreur lors du traitement : {e}")
